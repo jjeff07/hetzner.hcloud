@@ -87,7 +87,7 @@ EXAMPLES = """
   hetzner.hcloud.primary_ip:
     name: my-primary-ip
     state: absent
-    
+
 - name: Ensure the server is stopped
   hetzner.hcloud.server:
     name: my-server
