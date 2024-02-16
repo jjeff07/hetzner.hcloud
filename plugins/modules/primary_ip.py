@@ -218,6 +218,7 @@ class AnsibleHCloudPrimaryIP(AnsibleHCloud):
                 "type": self.module.params.get("type"),
                 "name": self.module.params.get("name"),
                 "auto_delete": self.module.params.get("auto_delete"),
+                "datacenter": None,
             }
             if self.module.params.get("server") is not None:
                 params["assignee_id"] = (
