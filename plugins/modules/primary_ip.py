@@ -158,11 +158,6 @@ hcloud_primary_ip:
             type: int
             returned: Always
             sample: 1937415
-        server:
-            description: Name of the server the Primary IP is assigned to, null if it is not assigned
-            type: str
-            returned: Always
-            sample: my-server
         auto_delete:
             description: True if the Primary IP is deleted when the resource it is assigned to is deleted
             type: bool
@@ -184,10 +179,8 @@ class AnsibleHCloudPrimaryIP(AnsibleHCloud):
     hcloud_primary_ip: BoundPrimaryIP | None = None
 
     def _prepare_result(self):
-        server = (
-            None
-            if self.hcloud_primary_ip.assignee_id is None
-            else to_native(self.client.servers.get_by_id(self.hcloud_primary_ip.assignee_id).name)
+        assignee_id = (
+            None if self.hcloud_primary_ip.assignee_id is None else to_native(self.hcloud_primary_ip.assignee_id)
         )
         return {
             "id": to_native(self.hcloud_primary_ip.id),
@@ -197,9 +190,8 @@ class AnsibleHCloudPrimaryIP(AnsibleHCloud):
             "datacenter": to_native(self.hcloud_primary_ip.datacenter.name),
             "labels": self.hcloud_primary_ip.labels,
             "delete_protection": self.hcloud_primary_ip.protection["delete"],
-            "assignee_id": to_native(self.hcloud_primary_ip.assignee_id),
-            "server": server,
-            "auto_delete": to_native(self.hcloud_primary_ip.auto_delete),
+            "assignee_id": assignee_id,
+            "auto_delete": self.hcloud_primary_ip.auto_delete,
         }
 
     def _get_primary_ip(self):
@@ -221,9 +213,7 @@ class AnsibleHCloudPrimaryIP(AnsibleHCloud):
                 "datacenter": None,
             }
             if self.module.params.get("server") is not None:
-                params["assignee_id"] = (
-                    self._client_get_by_name_or_id("servers", self.module.params.get("server")).id,
-                )
+                params["assignee_id"] = self._client_get_by_name_or_id("servers", self.module.params.get("server")).id
             elif self.module.params.get("datacenter") is not None:
                 params["datacenter"] = self.client.datacenters.get_by_name(self.module.params.get("datacenter"))
             else:

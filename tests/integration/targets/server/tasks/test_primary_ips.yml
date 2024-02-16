@@ -92,7 +92,7 @@
 - name: test create primary ipv6 attached to server
   hetzner.hcloud.primary_ip:
     name: "{{ hcloud_primary_ip_name }}v6"
-    server: my-server
+    server: "{{ hcloud_server_name }}"
     type: ipv6
     state: present
 - name: verify test create primary ipv6 attached to server
@@ -109,7 +109,7 @@
   delay: 2
 - name: cleanup test create primary ipv6 attached to server
   hetzner.hcloud.primary_ip:
-    name: "{{ hcloud_server_name }}v42"
+    name: "{{ hcloud_server_name }}v6"
     state: absent
   until: result is not failed
   retries: 5
