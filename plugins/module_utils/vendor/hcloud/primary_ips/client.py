@@ -189,9 +189,8 @@ class PrimaryIPsClient(ClientEntityBase):
     def create(
         self,
         type: str,
-        # TODO: Make the datacenter argument optional
-        datacenter: Datacenter | BoundDatacenter | None,
         name: str,
+        datacenter: Datacenter | BoundDatacenter | None = None,
         assignee_type: str | None = "server",
         assignee_id: int | None = None,
         auto_delete: bool | None = False,
