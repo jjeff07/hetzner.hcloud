@@ -137,7 +137,7 @@
 
 - name: cleanup tertiary ipv4 attached to server
   hetzner.hcloud.primary_ip:
-    name: "{{ hcloud_server_name }}v43"
+    name: "{{ hcloud_primary_ip_name }}v43"
     state: absent
   register: result
 - name: verify cleanup tertiary ipv4 attached to server
