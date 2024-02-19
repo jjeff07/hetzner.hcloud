@@ -116,24 +116,24 @@
     type: ipv6
     state: present
     auto_delete: true
-  register: result
+  register: primaryIPv6
 - name: verify test create primary ipv6 attached to server
   assert:
     that:
-      - result is changed
+      - primaryIPv6 is changed
 - name: test create primary ipv6 assignee_id
   hetzner.hcloud.primary_ip:
     name: "{{ hcloud_primary_ip_name }}v6"
     state: present
-  register: result
-  until: result.assignee_id is not none
+  register: primaryIPv6
+  until: primaryIPv6.assignee_id is not none
   retries: 5
   delay: 2
 - name: verify test create primary ipv6 assignee_id
   assert:
     that:
-      - result.hcloud_primary_ip.assignee_id == server.hcloud_server.id
-      - result.hcloud_primary_ip.auto_delete is sameas true
+      - primaryIPv6.hcloud_primary_ip.assignee_id == server.hcloud_server.id
+      - primaryIPv6.hcloud_primary_ip.auto_delete is sameas true
 
 - name: cleanup test create primary ipv4 attached to server
   hetzner.hcloud.primary_ip:
@@ -151,9 +151,10 @@
     state: absent
 - name: cleanup test create primary ipv6 attached to server
   hetzner.hcloud.primary_ip:
-    name: "{{ hcloud_server_name }}v6"
+    id: "{{ primaryIPv6.hcloud_primary_ip.id }}"
     state: absent
   ignore_errors: true
+  register: result
 - name: verify primary ipv6 auto_delete
   assert:
     that:
