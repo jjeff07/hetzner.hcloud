@@ -37,8 +37,9 @@ options:
         type: str
     server:
         description:
-            - Name or ID of the Hetzner Cloud offline Server the Primary IP should be assigned to.
-            - Required if no I(datacenter) is given and Primary IP does not exist.
+            - Name or ID of the Hetzner Cloud Server the Primary IP should be assigned to.
+            - The Primary IP cannot be assigned to a running server.
+            - Required if no O(datacenter) is given and the Primary IP does not exist.
         type: str
     type:
         description:
@@ -144,7 +145,7 @@ hcloud_primary_ip:
         delete_protection:
             description: True if Primary IP is protected for deletion
             type: bool
-            returned: Always
+            returned: always
             sample: false
         labels:
             description: User-defined labels (key-value pairs)
@@ -154,14 +155,14 @@ hcloud_primary_ip:
                 key: value
                 mylabel: 123
         assignee_id:
-            description: Numeric identifier of the Server the Primary IP is assigned to, null if it is not assigned
+            description: ID of the resource the Primary IP is assigned to, null if it is not assigned.
             type: int
-            returned: Always
+            returned: always
             sample: 1937415
         auto_delete:
-            description: True if the Primary IP is deleted when the resource it is assigned to is deleted
+            description: Delete the Primary IP when the resource it is assigned to is deleted.
             type: bool
-            returned: Always
+            returned: always
             sample: false
 """
 
@@ -210,7 +211,6 @@ class AnsibleHCloudPrimaryIP(AnsibleHCloud):
                 "type": self.module.params.get("type"),
                 "name": self.module.params.get("name"),
                 "auto_delete": self.module.params.get("auto_delete"),
-                "datacenter": None,
             }
             if self.module.params.get("server") is not None:
                 params["assignee_id"] = self._client_get_by_name_or_id("servers", self.module.params.get("server")).id
