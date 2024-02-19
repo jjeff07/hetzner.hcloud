@@ -159,4 +159,4 @@
   assert:
     that:
       - result is failed
-      #- 'result.msg == "Primary IP deletion is protected"'
+      - 'result.msg == "Primary IP with ID {{ primaryIPv6.hcloud_primary_ip.id }} not found"'
