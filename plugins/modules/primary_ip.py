@@ -159,6 +159,11 @@ hcloud_primary_ip:
             type: int
             returned: always
             sample: 1937415
+        assignee_type:
+            description: Resource type the Primary IP can be assigned to.
+            type: str
+            returned: always
+            sample: server
         auto_delete:
             description: Delete the Primary IP when the resource it is assigned to is deleted.
             type: bool
@@ -192,6 +197,7 @@ class AnsibleHCloudPrimaryIP(AnsibleHCloud):
             "labels": self.hcloud_primary_ip.labels,
             "delete_protection": self.hcloud_primary_ip.protection["delete"],
             "assignee_id": assignee_id,
+            "assignee_type": to_native(self.hcloud_primary_ip.assignee_type),
             "auto_delete": self.hcloud_primary_ip.auto_delete,
         }
 
