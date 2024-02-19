@@ -157,7 +157,9 @@
   ignore_errors: true
   register: result
 - name: verify test secondary ipv6 attached to server auto_delete
+  vars:
+    failed_msg: "Primary IP with ID {{ secondPrimaryIPv6.hcloud_primary_ip.id }} not found"
   assert:
     that:
       - result is failed
-      - 'result.msg == "Primary IP with ID {{ secondPrimaryIPv6.hcloud_primary_ip.id }} not found"'
+      - result.msg == failed_msg
