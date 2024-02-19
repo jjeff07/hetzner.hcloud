@@ -57,85 +57,90 @@
     that:
       - server is changed
 
-- name: cleanup create primary ipv4
+- name: cleanup primary ipv4
   hetzner.hcloud.primary_ip:
     name: "{{ hcloud_server_name }}v4"
     state: absent
   register: result
-- name: verify cleanup create primary ipv4
+- name: verify cleanup primary ipv4
   assert:
     that:
       - result is changed
-- name: cleanup create second primary ipv4
+- name: cleanup second primary ipv4
   hetzner.hcloud.primary_ip:
     name: "{{ hcloud_server_name }}v42"
     state: absent
-- name: verify cleanup create second primary ipv4
+- name: verify cleanup second primary ipv4
   assert:
     that:
       - result is changed
-- name: cleanup create primary ipv6
+- name: cleanup primary ipv6
   hetzner.hcloud.primary_ip:
     name: "{{ hcloud_server_name }}v6"
     state: absent
-- name: verify cleanup create primary ipv6
+- name: verify cleanup primary ipv6
   assert:
     that:
       - result is changed
 
-- name: test create primary ipv4 attached to server
+- name: test create tertiary ipv4 attached to server
   hetzner.hcloud.primary_ip:
-    name: "{{ hcloud_primary_ip_name }}v4"
+    name: "{{ hcloud_primary_ip_name }}v43"
     server: "{{ hcloud_server_name }}"
     type: ipv4
     state: present
     auto_delete: false
   register: result
+- name: verify test create tertiary ipv4 attached to server
   assert:
     that:
       - result is changed
-- name: verify test create primary ipv4 attached to server
+- name: test tertiary ipv4 assignee_id
   hetzner.hcloud.primary_ip:
-    name: "{{ hcloud_primary_ip_name }}v4"
+    name: "{{ hcloud_primary_ip_name }}v43"
     state: present
   register: result
+  until: result.assignee_id is not none
+  retries: 5
+  delay: 2
+- name: verify test tertiary ipv4 assignee_id
   assert:
     that:
       - result.hcloud_primary_ip.assignee_id == server.hcloud_server.id
       - result.hcloud_primary_ip.auto_delete is sameas false
-  until: result.assignee_id is not null
-  retries: 5
-  delay: 2
-- name: test create primary ipv6 attached to server
+
+- name: test create secondary ipv6 attached to server
   hetzner.hcloud.primary_ip:
-    name: "{{ hcloud_primary_ip_name }}v6"
+    name: "{{ hcloud_primary_ip_name }}v62"
     server: "{{ hcloud_server_name }}"
     type: ipv6
     state: present
     auto_delete: true
-  register: result
+  register: secondPrimaryIPv6
+- name: verify test create secondary ipv6 attached to server
   assert:
     that:
-      - result is changed
-- name: verify test create primary ipv6 attached to server
+      - secondPrimaryIPv6 is changed
+- name: test secondary ipv6 assignee_id
   hetzner.hcloud.primary_ip:
-    name: "{{ hcloud_primary_ip_name }}v6"
+    name: "{{ hcloud_primary_ip_name }}v62"
     state: present
-  register: result
-  assert:
-    that:
-      - result.hcloud_primary_ip.assignee_id == server.hcloud_server.id
-      - result.hcloud_primary_ip.auto_delete is sameas true
-  until: result.assignee_id is not null
+  register: secondPrimaryIPv6
+  until: secondPrimaryIPv6.assignee_id is not none
   retries: 5
   delay: 2
+- name: verify test secondary ipv6 assignee_id
+  assert:
+    that:
+      - secondPrimaryIPv6.hcloud_primary_ip.assignee_id == server.hcloud_server.id
+      - secondPrimaryIPv6.hcloud_primary_ip.auto_delete is sameas true
 
-
-- name: cleanup test create primary ipv4 attached to server
+- name: cleanup tertiary ipv4 attached to server
   hetzner.hcloud.primary_ip:
-    name: "{{ hcloud_server_name }}v4"
+    name: "{{ hcloud_primary_ip_name }}v43"
     state: absent
   register: result
+- name: verify cleanup tertiary ipv4 attached to server
   assert:
     that:
       - result is changed
@@ -144,13 +149,15 @@
   hetzner.hcloud.server:
     name: "{{ hcloud_server_name }}"
     state: absent
-- name: cleanup test create primary ipv6 attached to server
+
+- name: test secondary ipv6 attached to server auto_delete
   hetzner.hcloud.primary_ip:
-    name: "{{ hcloud_server_name }}v6"
+    id: "{{ secondPrimaryIPv6.hcloud_primary_ip.id }}"
     state: absent
   ignore_errors: true
-- name: verify primary ipv6 auto_delete
+  register: result
+- name: verify test secondary ipv6 attached to server auto_delete
   assert:
     that:
       - result is failed
-      #- 'result.msg == "Primary IP deletion is protected"'
+      - 'result.msg == "Primary IP with ID {{ secondPrimaryIPv6.hcloud_primary_ip.id }} not found"'
