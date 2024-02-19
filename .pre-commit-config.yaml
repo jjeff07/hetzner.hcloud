@@ -28,7 +28,7 @@ repos:
         exclude: ^changelogs/(dev-changelog\.md|changelog\.yaml)$
 
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.15.0
+    rev: v3.15.1
     hooks:
       - id: pyupgrade
         args: [--py38-plus]
@@ -39,12 +39,12 @@ repos:
       - id: isort
 
   - repo: https://github.com/psf/black-pre-commit-mirror
-    rev: 24.1.1
+    rev: 24.2.0
     hooks:
       - id: black
 
   - repo: https://github.com/ansible-community/antsibull-changelog
-    rev: 0.23.0
+    rev: 0.25.0
     hooks:
       - id: antsibull-changelog-lint
       - id: antsibull-changelog-lint-changelog-yaml
