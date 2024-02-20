@@ -225,8 +225,6 @@ class AnsibleHCloudPrimaryIP(AnsibleHCloud):
                 params["assignee_id"] = self._client_get_by_name_or_id("servers", self.module.params.get("server")).id
             elif self.module.params.get("datacenter") is not None:
                 params["datacenter"] = self.client.datacenters.get_by_name(self.module.params.get("datacenter"))
-            else:
-                self.module.fail_json(msg="server or datacenter is required")
 
             if self.module.params.get("labels") is not None:
                 params["labels"] = self.module.params.get("labels")
