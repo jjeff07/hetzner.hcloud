@@ -214,7 +214,7 @@ class AnsibleHCloudPrimaryIP(AnsibleHCloud):
 
     def _create_primary_ip(self):
         self.module.fail_on_missing_params(required_params=["type", "name"])
-        check_required_one_of(["server", "datacenter"], self.module.params)
+        self.module._check_required_one_of(["server", "datacenter"], self.module.params)
         try:
             params = {
                 "type": self.module.params.get("type"),
