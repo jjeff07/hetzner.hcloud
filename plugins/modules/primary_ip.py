@@ -173,6 +173,8 @@ hcloud_primary_ip:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
+from ansible.module_utils.common.validation import check_required_one_of
+from ansible.module_utils.errors import RequiredOneOfError
 
 from ..module_utils.hcloud import AnsibleHCloud
 from ..module_utils.vendor.hcloud import HCloudException
@@ -212,6 +214,10 @@ class AnsibleHCloudPrimaryIP(AnsibleHCloud):
 
     def _create_primary_ip(self):
         self.module.fail_on_missing_params(required_params=["type", "name"])
+        try:
+            check_required_one_of(["server", "datacenter"], self.module.params)
+        except TypeError as exc:
+            raise RequiredOneOfError(exc) from exc
         try:
             params = {
                 "type": self.module.params.get("type"),
